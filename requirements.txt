@@ -1,0 +1,5 @@
+agentdojo[transformers]
+openai
+python-dotenv
+pandas
+rich
