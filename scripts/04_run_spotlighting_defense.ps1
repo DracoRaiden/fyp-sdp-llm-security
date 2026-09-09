@@ -6,28 +6,20 @@ if ($null -eq $env:VIRTUAL_ENV) {
 # Force UTF-8 output encoding for python to prevent Windows cp1252 UnicodeEncodeError
 $env:PYTHONIOENCODING = "utf-8"
 
-Write-Host "Running Step 8: First AgentDojo no-attack run (user_task_0)..." -ForegroundColor Cyan
-python -m agentdojo.scripts.benchmark `
-  -s workspace `
-  -ut user_task_0 `
-  --model OPENAI_COMPATIBLE `
-  --model-id openai/gpt-oss-120b `
-  --logdir runs/groq_gptoss120b_no_attack_workspace_0 `
-  --force-rerun
-
-Write-Host "Sleeping 20 seconds before next runs..." -ForegroundColor Yellow
-Start-Sleep -Seconds 20
-
-Write-Host "Running Step 9: Five no-attack utility tasks (user_task_0 to user_task_4)..." -ForegroundColor Cyan
 $tasks = "user_task_0", "user_task_1", "user_task_2", "user_task_3", "user_task_4"
+
+Write-Host "Running Spotlighting Defense Test (openai/gpt-oss-120b)..." -ForegroundColor Cyan
 foreach ($task in $tasks) {
-    Write-Host "Running no-attack task: $task..." -ForegroundColor Cyan
+    Write-Host "Running spotlighting defense task: $task..." -ForegroundColor Cyan
     python -m agentdojo.scripts.benchmark `
       -s workspace `
       -ut $task `
+      -it injection_task_0 `
       --model OPENAI_COMPATIBLE `
       --model-id openai/gpt-oss-120b `
-      --logdir runs/groq_gptoss120b_no_attack_workspace_0_4 `
+      --attack tool_knowledge `
+      --defense spotlighting_with_delimiting `
+      --logdir runs/groq_gptoss120b_defense_spotlighting_workspace_0_4 `
       --force-rerun
       
     if ($task -ne $tasks[-1]) {
@@ -35,4 +27,3 @@ foreach ($task in $tasks) {
         Start-Sleep -Seconds 20
     }
 }
-
